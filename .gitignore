@@ -1,0 +1,14 @@
+/*
+
+!.gitignore
+!alacritty/
+!i3/
+!i3status/
+
+!tmux/
+tmux/plugins
+
+!zsh/
+!zsh/.zshrc
+
+!picom/

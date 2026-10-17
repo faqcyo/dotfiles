@@ -1,0 +1,29 @@
+[env]
+TERM = "xterm-256color"
+
+[window]
+opacity = 1.0
+
+[colors]
+[colors.primary]
+foreground = "#FFFFFF"
+background = "#000000"
+
+[font]
+size = 9.85
+
+[font.normal]
+family = "JetBrainsMonoNL Nerd Font"
+style = "Regular"
+
+[font.bold]
+family = "JetBrainsMonoNL Nerd Font"
+style = "Bold"
+
+[keyboard]
+bindings = [{ key = "Enter", mods = "Super", action = "SpawnNewInstance" }]
+
+[general]
+import = [
+  "~/.config/alacritty/themes/themes/one_dark.toml"
+]

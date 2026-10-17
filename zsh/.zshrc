@@ -1,0 +1,81 @@
+# Lines configured by zsh-newuser-install
+HISTFILE=~/.histfile
+HISTSIZE=1000
+SAVEHIST=1000
+bindkey -v
+# End of lines configured by zsh-newuser-install
+# The following lines were added by compinstall
+zstyle :compinstall filename "$HOME/.zshrc"
+
+autoload -Uz compinit
+compinit
+# End of lines added by compinstall
+
+export XDG_CONFIG_HOME=$HOME/.config
+export ZSH_DIR=$XDG_CONFIG_HOME/zsh
+export ZPLUG_HOME=$XDG_CONFIG_HOME/zsh/zplug
+
+# Load ZINIT plugin manager
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+[ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
+[ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+source "${ZINIT_HOME}/zinit.zsh"
+
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+
+
+# Plugins
+
+zinit snippet OMZ::plugins/colorize/colorize.plugin.zsh
+
+zinit ice wait lucid
+zinit light zsh-users/zsh-autosuggestions
+
+zinit ice wait lucid
+zinit light jeffreytse/zsh-vi-mode
+
+zinit ice wait lucid
+zinit light zsh-users/zsh-syntax-highlighting
+
+
+# Load Pure theme
+
+zinit ice pick"async.zsh" src"pure.zsh" # with zsh-async library that's bundled with it.
+zinit light sindresorhus/pure
+
+
+# Environment Variables
+export XDG_CURRENT_DESKTOP=i3
+export SHELL=/bin/zsh
+export FIGLET_FONTDIR=$HOME/.local/share/figlet/fonts
+export VIM_CONFIG=$HOME/.vim
+export TERM=xterm-256color
+export LS_COLORS="no=00;37:di=01;32:fi=00;37:ln=07;34:ex=07;31"
+export ANDROID_HOME=/shared/facu/Android/Sdk
+export GEM_HOME="$(gem env user_gemhome)"
+export PATH=/home/facu/.scripts:/home/facu/.local/bin:/home/facu/.config/emacs/bin:$GEM_HOME/bin:/home/facu/.cargo/bin:$PATH
+
+
+# Pyenv Setup
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init - zsh)"
+
+
+# Alias
+alias ls='ls --color'
+alias nocat='command cat'
+# alias cat='ccat'
+
+
+# Color theme
+zstyle ':prompt:pure:path' color 107
+zstyle ':prompt:pure:prompt:success' color 107
+zstyle ':prompt:pure:git:branch' color 179
+zstyle ':prompt:pure:git:dirty' color 167
+zstyle ':prompt:pure:git:arrow' color 167
+
+export PATH=/home/facu/.local/bin:$PATH
+
+# [[ -e "/home/facu/.local/bin/oracle-cli/lib/python3.13/site-packages/oci_cli/bin/oci_autocomplete.sh" ]] && source "/home/facu/.local/bin/oracle-cli/lib/python3.13/site-packages/oci_cli/bin/oci_autocomplete.sh"
