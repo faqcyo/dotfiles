@@ -18,9 +18,9 @@ exec_always --no-startup-id xset r rate 200 35
 exec --no-startup-id setxkbmap -layout us -variant intl
 exec --no-startup-id xsetroot -solid "#000000"
 exec --no-startup-id dunst
-exec --no-startup-id $XDG_CONFIG_HOME/fabric/start.sh
-#exec --no-startup-id picom -b
-exec --no-startup-id feh --bg-scale $HOME/Pictures/Wallpapers/main.png
+#exec --no-startup-id $XDG_CONFIG_HOME/fabric/start.sh
+exec --no-startup-id picom -b
+exec --no-startup-id feh --bg-scale $HOME/.config/i3/wallpaper.png
 exec --no-startup-id xautolock -time 30 -detectsleep -locker "systemctl suspend-then-hibernate"
 #exec --no-startup-id xrandr --output HDMI-1 --primary --auto --output DisplayPort-0 --off
 focus_follows_mouse no
@@ -207,39 +207,35 @@ bindsym $mod+r mode "resize"
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
-set $primary-color "#FFFFFF"
-set $background-color "#282C34"
-set $foreground-color "#ABB2BF"
-#bar {
-#  status_command i3status
-#  i3bar_command i3bar --transparency
-#  colors {
-#    background #FFFFFF00
-#    statusline $foreground-color
-#    separator  $background-color
-#
-#    # <colorClass>     <border>          <background>        <text>
-#    focused_workspace  $primary-color    $primary-color      #000000
-#    inactive_workspace $background-color $background-color   #000000 
-#  }
-#}
+set $primary-color "#7d7973"
+set $background-color "#100d09"
+bar {
+  status_command SCRIPT_DIR=$HOME/.config/i3blocks/scripts i3blocks
+  i3bar_command i3bar --transparency
+  colors {
+# Use RGBA hex code: #RRGGBBAA (last two characters set the alpha/transparency)
+    background #00000000
+    separator  #7d797399
 
-default_border pixel 1
-default_floating_border pixel 1
+    focused_workspace  $primary-color $primary-color $background-color
+    inactive_workspace #00000000 #00000000 $primary-color
+    urgent_workspace   #F7768E #F7768E #24283B
+  }
+}
 
-for_window [class="^.*"] border pixel 1
+default_border pixel 2
+default_floating_border pixel 2
+
+for_window [class="^.*"] border pixel 2
 
 # client.<attribute> #border #background #text #indicator #child_border
-client.focused          $primary-color $primary-color #000000 $foreground-color $primary-color 
+client.focused          $primary-color $primary-color #000000 $primary-color $primary-color 
 client.focused_inactive #333333 #5f676a #ffffff #484e50   #5f676a
-client.unfocused        $background-color $background-color $foreground-color $primary-color   #22222200
+client.unfocused        $background-color $background-color $primary-color $primary-color   #22222200
 client.urgent           #2f343a #900000 #ffffff #900000   #900000
 client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
 
 client.background       #000000
-
-gaps inner 8
-gaps bottom -8
 
 # Disable title bar for EmulationStation
 for_window [class="^(EmulationStation|es-de)$"] border pixel 0
@@ -254,3 +250,34 @@ for_window [class="^(EmulationStation|es-de)$"] focus
 for_window [class="^(EmulationStation|es-de)$"] floating enable, border none
 
 for_window [class="^(EmulationStation|es-de)$"] floating enable, move position 0 px 0 px
+
+
+# change volume or toggle mute
+bindsym XF86AudioRaiseVolume exec amixer -q -D pulse sset Master 5%+ && pkill -RTMIN+10 i3blocks 
+bindsym XF86AudioLowerVolume exec amixer -q -D pulse sset Master 5%- && pkill -RTMIN+10 i3blocks
+bindsym XF86AudioMute exec amixer -q -D pulse sset Master toggle && pkill -RTMIN+10 i3blocks
+
+# Control mpc with numpad
+bindsym KP_Enter mode "music_mode"
+mode "music_mode" {
+  bindsym KP_Begin exec mpc toggle; mode "default"
+  bindsym mod2+KP_5 exec mpc toggle; mode "default"
+
+  bindsym KP_Up exec mpc volume +10
+  bindsym mod2+KP_8 exec mpc volume +10
+  
+  bindsym KP_Down exec mpc volume -10
+  bindsym mod2+KP_2 exec mpc volume -10
+
+  bindsym KP_Left exec mpc prev; mode "default"
+  bindsym mod2+KP_4 exec mpc prev; mode "default"
+
+  bindsym KP_Right exec mpc next; mode "default"
+  bindsym mod2+KP_6 exec mpc next; mode "default"
+
+  bindsym KP_Enter mode "default"
+  bindsym Escape mode "default"
+}
+
+# Workspace resurrection / Workspace management
+bindsym $mod+m exec $HOME/.config/i3/scripts/i3-resurrect.sh

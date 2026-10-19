@@ -1,0 +1,59 @@
+#!/usr/bin/bash
+MAX_LEN=50
+SPACER="   ***   "
+
+check_input() {
+  case "${BLOCK_BUTTON}" in
+    1) mpc prev &>/dev/null ;;
+    2) mpc toggle &>/dev/null && echo "$1" && exit 0 ;;
+    3) mpc next &>/dev/null ;;
+    4) mpc volume +10 &>/dev/null && echo "$1" && exit 0;;
+    5) mpc volume -10 &>/dev/null && echo "$1" && exit 0;;
+  esac
+}
+
+SONG=$(mpc current)
+if [ -z "$SONG" ]; then
+    echo "exited"
+    exit 0
+fi
+
+STATE_FILE="/tmp/i3blocks_mpd_scroll_step"
+CROPPED_SONG_FILE="/tmp/i3blocks_mpd_cropped_song"
+LAST_SONG_FILE="/tmp/i3blocks_mpd_last_song"
+[ -f "$STATE_FILE" ] && STEP=$(cat "$STATE_FILE") || STEP=0
+[ -f "$CROPPED_SONG_FILE" ] && CROPPED_SONG=$(cat "$CROPPED_SONG_FILE") || CROPPED_SONG=""
+[ -f "$LAST_SONG_FILE" ] && LAST_SONG=$(cat "$LAST_SONG_FILE") || LAST_SONG=""
+
+
+if [ "$SONG" != "$LAST_SONG" ]; then
+    STEP=0
+    CROPPED_SONG=$(mpc current | sed -e 's|.*/||' -e 's/\.[^.]*$//')
+    echo "$CROPPED_SONG" > "$CROPPED_SONG_FILE" 
+    echo "$SONG" > "$LAST_SONG_FILE"
+fi
+
+if [ ${#CROPPED_SONG} -gt $MAX_LEN ]; then
+    DISPLAY_STR="${CROPPED_SONG}${SPACER}"
+else
+    check_input "$CROPPED_SONG"
+    echo "$CROPPED_SONG"
+    exit 0
+fi
+
+
+TOTAL_LEN=${#DISPLAY_STR}
+VISIBLE_PART=$(echo "$DISPLAY_STR" | awk -v pos=$((STEP + 1)) -v len=$MAX_LEN '{print substr($0, pos, len)}')
+VISIBLE_LEN=${#VISIBLE_PART}
+if [ "$VISIBLE_LEN" -lt "$MAX_LEN" ]; then
+    REMAINDER=$((MAX_LEN - VISIBLE_LEN))
+    VISIBLE_PART="${VISIBLE_PART}$(echo "$DISPLAY_STR" | awk -v len=$REMAINDER '{print substr($0, 1, len)}')"
+fi
+
+# Moved it here to prevent stepping every time the volume changes
+check_input "${VISIBLE_PART}"
+
+STEP=$(((STEP + 1) % TOTAL_LEN))
+echo "$STEP" > "$STATE_FILE"
+
+echo "$VISIBLE_PART"

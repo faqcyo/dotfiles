@@ -3,6 +3,7 @@
 !.gitignore
 !alacritty/
 !i3/
+!i3blocks/
 !i3status/
 
 !tmux/
